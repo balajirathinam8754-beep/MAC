@@ -1,0 +1,48 @@
+module mac_pipelined #(
+    parameter DATA_W = 8,
+    parameter ACC_W  = 2*DATA_W
+)(
+    input clk,
+    input rst,
+    input en,
+    input clear,
+    input signed [DATA_W-1:0] a,
+    input signed [DATA_W-1:0] b,
+    output reg signed [ACC_W-1:0] acc,
+    output reg valid
+);
+
+// Stage 1: multiplication
+reg signed [ACC_W-1:0] mult_stage;
+reg stage1_valid;
+
+// Stage 2: accumulation
+always @(posedge clk) begin
+    if (rst) begin
+        mult_stage   <= 0;
+        stage1_valid <= 0;
+    end else if (en) begin
+        mult_stage   <= a * b;
+        stage1_valid <= 1;
+    end else begin
+        stage1_valid <= 0;
+    end
+end
+
+// Accumulation stage
+always @(posedge clk) begin
+    if (rst) begin
+        acc   <= 0;
+        valid <= 0;
+    end else if (clear) begin
+        acc   <= 0;
+        valid <= 0;
+    end else if (stage1_valid) begin
+        acc   <= acc + mult_stage;
+        valid <= 1;
+    end else begin
+        valid <= 0;
+    end
+end
+
+endmodule
