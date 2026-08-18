@@ -1,0 +1,74 @@
+class mac_sequence extends uvm_sequence #(mac_sequence_item);
+
+    `uvm_object_utils(mac_sequence)
+
+    function new(string name = "mac_sequence");
+        super.new(name);
+    endfunction
+
+    task body();
+
+        mac_sequence_item req;
+
+        // First transaction
+        req = mac_sequence_item::type_id::create("req");
+        start_item(req);
+
+        req.a     = 5;
+        req.b     = 2;
+        req.en    = 1;
+        req.clear = 0;
+
+        finish_item(req);
+
+
+        // Second transaction
+        req = mac_sequence_item::type_id::create("req");
+        start_item(req);
+
+        req.a     = 3;
+        req.b     = 4;
+        req.en    = 1;
+        req.clear = 0;
+
+        finish_item(req);
+
+
+        // Negative multiplication
+        req = mac_sequence_item::type_id::create("req");
+        start_item(req);
+
+        req.a     = -2;
+        req.b     = 6;
+        req.en    = 1;
+        req.clear = 0;
+
+        finish_item(req);
+
+
+        // Clear accumulator
+        req = mac_sequence_item::type_id::create("req");
+        start_item(req);
+
+        req.a     = 0;
+        req.b     = 0;
+        req.en    = 0;
+        req.clear = 1;
+
+        finish_item(req);
+
+
+        // New accumulation after clear
+        req = mac_sequence_item::type_id::create("req");
+        start_item(req);
+
+        req.a     = 2;
+        req.b     = 2;
+        req.en    = 1;
+        req.clear = 0;
+
+        finish_item(req);
+
+    endtask
+
+endclass
