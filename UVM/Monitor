@@ -1,0 +1,64 @@
+class mac_monitor extends uvm_monitor;
+
+    `uvm_component_utils(mac_monitor)
+
+    virtual mac_if vif;
+
+    uvm_analysis_port #(mac_sequence_item) analysis_port;
+
+
+    function new(
+        string name = "mac_monitor",
+        uvm_component parent = null
+    );
+
+        super.new(name, parent);
+
+        analysis_port =
+            new("analysis_port", this);
+
+    endfunction
+
+
+    function void build_phase(uvm_phase phase);
+
+        super.build_phase(phase);
+
+        if (!uvm_config_db#(virtual mac_if)::get(
+                this,
+                "",
+                "vif",
+                vif
+            ))
+
+            `uvm_fatal("MONITOR",
+                       "Virtual interface not found")
+
+    endfunction
+
+
+    task run_phase(uvm_phase phase);
+
+        mac_sequence_item item;
+
+        forever begin
+
+            @(posedge vif.clk);
+
+            item = mac_sequence_item::type_id::create("item");
+
+            item.a     = vif.a;
+            item.b     = vif.b;
+            item.en    = vif.en;
+            item.clear = vif.clear;
+
+            item.acc   = vif.acc;
+            item.valid = vif.valid;
+
+            analysis_port.write(item);
+
+        end
+
+    endtask
+
+endclass
