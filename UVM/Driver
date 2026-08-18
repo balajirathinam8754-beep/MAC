@@ -1,0 +1,58 @@
+class mac_driver extends uvm_driver #(mac_sequence_item);
+
+    `uvm_component_utils(mac_driver)
+
+    virtual mac_if vif;
+
+    function new(
+        string name = "mac_driver",
+        uvm_component parent = null
+    );
+        super.new(name, parent);
+    endfunction
+
+
+    function void build_phase(uvm_phase phase);
+
+        super.build_phase(phase);
+
+        if (!uvm_config_db#(virtual mac_if)::get(
+                this,
+                "",
+                "vif",
+                vif
+            ))
+
+            `uvm_fatal("DRIVER",
+                       "Virtual interface not found")
+
+    endfunction
+
+
+    task run_phase(uvm_phase phase);
+
+        mac_sequence_item req;
+
+        forever begin
+
+            seq_item_port.get_next_item(req);
+
+            @(posedge vif.clk);
+
+            vif.a     <= req.a;
+            vif.b     <= req.b;
+            vif.en    <= req.en;
+            vif.clear <= req.clear;
+
+            @(posedge vif.clk);
+
+            vif.en    <= 0;
+            vif.clear <= 0;
+
+            seq_item_port.item_done();
+
+        end
+
+    endtask
+
+endclass
