@@ -1,0 +1,83 @@
+class mac_scoreboard extends uvm_scoreboard;
+
+    `uvm_component_utils(mac_scoreboard)
+
+    uvm_analysis_imp #(mac_sequence_item,
+                       mac_scoreboard) analysis_export;
+
+    logic signed [15:0] expected_acc;
+
+
+    function new(
+        string name = "mac_scoreboard",
+        uvm_component parent = null
+    );
+
+        super.new(name, parent);
+
+        analysis_export =
+            new("analysis_export", this);
+
+        expected_acc = 0;
+
+    endfunction
+
+
+    function void write(mac_sequence_item item);
+
+        if (item.clear) begin
+
+            expected_acc = 0;
+
+            `uvm_info(
+                "SCOREBOARD",
+                "Accumulator cleared",
+                UVM_MEDIUM
+            )
+
+        end
+
+        else if (item.en) begin
+
+            expected_acc =
+                expected_acc +
+                ($signed(item.a) * $signed(item.b));
+
+        end
+
+
+        if (item.valid) begin
+
+            if (item.acc === expected_acc) begin
+
+                `uvm_info(
+                    "SCOREBOARD",
+                    $sformatf(
+                        "PASS: A=%0d B=%0d ACC=%0d",
+                        item.a,
+                        item.b,
+                        item.acc
+                    ),
+                    UVM_MEDIUM
+                )
+
+            end
+
+            else begin
+
+                `uvm_error(
+                    "SCOREBOARD",
+                    $sformatf(
+                        "FAIL: Expected=%0d Got=%0d",
+                        expected_acc,
+                        item.acc
+                    )
+                )
+
+            end
+
+        end
+
+    endfunction
+
+endclass
