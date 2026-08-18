@@ -1,0 +1,129 @@
+module mac_pipelined_tb;
+
+parameter DATA_W = 8;
+
+reg clk;
+reg rst;
+reg en;
+reg clear;
+reg signed [DATA_W-1:0] a, b;
+
+wire signed [2*DATA_W-1:0] acc;
+wire valid;
+
+// DUT
+mac_pipelined #(DATA_W) dut (
+    .clk(clk),
+    .rst(rst),
+    .en(en),
+    .clear(clear),
+    .a(a),
+    .b(b),
+    .acc(acc),
+    .valid(valid)
+);
+
+// Clock generation
+always #5 clk = ~clk;
+
+// Stimulus
+initial begin
+    clk = 0;
+    rst = 1;
+    en = 0;
+    clear = 0;
+
+    #10 rst = 0;
+
+    en = 1;
+
+    // Test sequence
+    a = 5;  b = 2;  #10;  // 10
+    a = 3;  b = 4;  #10;  // +12
+    a = -2; b = 6;  #10;  // -12
+    a = 1;  b = -3; #10;  // -3
+
+    // Clear accumulator
+    clear = 1; #10;
+    clear = 0;
+
+    a = 2; b = 2; #10;   // 4
+
+    en = 0;
+    #20;
+
+    $finish;
+end
+
+// Monitor
+initial begin
+    $monitor("Time=%0t | a=%d b=%d en=%b acc=%d valid=%b",
+              $time, a, b, en, acc, valid);
+end
+
+endmodule`timescale 1ns/1ps
+
+module mac_pipelined_tb;
+
+parameter DATA_W = 8;
+
+reg clk;
+reg rst;
+reg en;
+reg clear;
+reg signed [DATA_W-1:0] a, b;
+
+wire signed [2*DATA_W-1:0] acc;
+wire valid;
+
+// DUT
+mac_pipelined #(DATA_W) dut (
+    .clk(clk),
+    .rst(rst),
+    .en(en),
+    .clear(clear),
+    .a(a),
+    .b(b),
+    .acc(acc),
+    .valid(valid)
+);
+
+// Clock generation
+always #5 clk = ~clk;
+
+// Stimulus
+initial begin
+    clk = 0;
+    rst = 1;
+    en = 0;
+    clear = 0;
+
+    #10 rst = 0;
+
+    en = 1;
+
+    // Test sequence
+    a = 5;  b = 2;  #10;  // 10
+    a = 3;  b = 4;  #10;  // +12
+    a = -2; b = 6;  #10;  // -12
+    a = 1;  b = -3; #10;  // -3
+
+    // Clear accumulator
+    clear = 1; #10;
+    clear = 0;
+
+    a = 2; b = 2; #10;   // 4
+
+    en = 0;
+    #20;
+
+    $finish;
+end
+
+// Monitor
+initial begin
+    $monitor("Time=%0t | a=%d b=%d en=%b acc=%d valid=%b",
+              $time, a, b, en, acc, valid);
+end
+
+endmodule
