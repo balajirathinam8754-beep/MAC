@@ -1,0 +1,15 @@
+package uvm_mac_pkg;
+
+    import uvm_pkg::*;
+
+    `include "uvm_mac_sequence_item.sv"
+    `include "uvm_mac_sequence.sv"
+    `include "uvm_mac_sequencer.sv"
+    `include "uvm_mac_driver.sv"
+    `include "uvm_mac_monitor.sv"
+    `include "uvm_mac_scoreboard.sv"
+    `include "uvm_mac_agent.sv"
+    `include "uvm_mac_env.sv"
+    `include "uvm_mac_test.sv"
+
+endpackage
