@@ -1,0 +1,13 @@
+interface mac_if #(parameter DATA_W = 8)(input logic clk);
+
+    logic rst;
+    logic en;
+    logic clear;
+
+    logic signed [DATA_W-1:0] a;
+    logic signed [DATA_W-1:0] b;
+
+    logic signed [(2*DATA_W)-1:0] acc;
+    logic valid;
+
+endinterface
