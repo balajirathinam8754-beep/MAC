@@ -1,0 +1,61 @@
+`timescale 1ns/1ps
+
+import uvm_pkg::*;
+`include "uvm_mac_pkg.sv"
+
+module mac_tb_top;
+
+    logic clk;
+
+    always #5 clk = ~clk;
+
+    mac_if mac_vif(clk);
+
+    mac_pipelined #(
+        .DATA_W(8),
+        .ACC_W(16)
+    ) dut (
+
+        .clk   (clk),
+        .rst   (mac_vif.rst),
+        .en    (mac_vif.en),
+        .clear (mac_vif.clear),
+        .a     (mac_vif.a),
+        .b     (mac_vif.b),
+        .acc   (mac_vif.acc),
+        .valid (mac_vif.valid)
+
+    );
+
+
+    initial begin
+
+        clk = 0;
+
+        mac_vif.rst   = 1;
+        mac_vif.en    = 0;
+        mac_vif.clear = 0;
+        mac_vif.a     = 0;
+        mac_vif.b     = 0;
+
+        #20;
+
+        mac_vif.rst = 0;
+
+    end
+
+
+    initial begin
+
+        uvm_config_db#(virtual mac_if)::set(
+            null,
+            "*",
+            "vif",
+            mac_vif
+        );
+
+        run_test("mac_test");
+
+    end
+
+endmodule
